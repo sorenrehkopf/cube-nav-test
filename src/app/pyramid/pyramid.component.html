@@ -1,2 +1,18 @@
+<div class="position-panel">
+	<button (click)="pyramid.adjust('position','x',.5)">+ p x</button>
+	<button (click)="pyramid.adjust('position','y',.5)">+ p y</button>
+	<button (click)="pyramid.adjust('position','z',.5)">+ p z</button>
+	<button (click)="pyramid.adjust('rotation','x',.1)">+ r x</button>
+	<button (click)="pyramid.adjust('rotation','y',.1)">+ r y</button>
+	<button (click)="pyramid.adjust('rotation','z',.1)">+ r z</button>
+</div>
+<div  class="position-panel">
+	<button (click)="pyramid.adjust('position','x',-.5)">- p x</button>
+	<button (click)="pyramid.adjust('position','y',-.5)">- p y</button>
+	<button (click)="pyramid.adjust('position','z',-.5)">- p z</button>
+	<button (click)="pyramid.adjust('rotation','x',-.1)">- r x</button>
+	<button (click)="pyramid.adjust('rotation','y',-.1)">- r y</button>
+	<button (click)="pyramid.adjust('rotation','z',-.1)">- r z</button>
+</div>
 <nav routerLink="/" class="pyramid-nav" id="pyr-nav">
 </nav>

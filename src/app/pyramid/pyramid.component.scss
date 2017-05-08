@@ -1,9 +1,18 @@
 #pyr-nav{
 	position:absolute;
-	top:calc(50vh - 300px);
-	left:calc(50vw - 300px);
+	bottom:calc(50vh - 300px);
+	right:calc(50vw - 300px);
+	transition:1000ms ease;
+	transform-origin:bottom right;
 	canvas{
 		width:600px;
 		height:600px;
+	}
+	&.shrunk{
+		transform:scale(.2);
+		top:auto;
+		left:auto;
+		bottom:10px;
+		right:10px;
 	}
 }
