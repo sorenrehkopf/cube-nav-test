@@ -15,6 +15,7 @@ export class PyramidNavService {
 	scene = new Three.Scene();
 	camera = new Three.PerspectiveCamera(45, 600/600);
 	renderer = new Three.WebGLRenderer({alpha:true});
+	raycaster = new Three.Raycaster();
 	routes = Routes;
 	autoRotate = false;
 
@@ -39,9 +40,24 @@ export class PyramidNavService {
 		this.renderer.domElement.addEventListener('touchstart',this.interactionStartHandler.bind(this));
 	}
 
-	public toggle(){
+	public toggle(e){
+		console.log(e)
+		var elPos = this.containerEl.getBoundingClientRect();
+		var y = e.clientY || e.touches[0].clientY;
+		var x = e.clientX ||e.touches[0].clientX;
+		x = ( (x-elPos.left) / this.renderer.domElement.width ) * 2 - 1;
+		y = - ( (y-(elPos.top)) / this.renderer.domElement.height ) * 2 + 1;
+		var vector = new Three.Vector2(x,y);
+		document.onmousemove = null;
+		document.ontouchmove = null;
 		this.autoRotate = true;
 		this.containerEl.classList.toggle('shrunk');
+		this.raycaster.setFromCamera(vector,this.camera);
+		var objects = this.raycaster.intersectObjects(this.cube.children);
+		if(objects[0]){
+
+		}
+		console.log(objects,this.cube.children,vector);
 	}
 
 	public interactionStartHandler(e){
@@ -56,7 +72,6 @@ export class PyramidNavService {
 	}
 
 	public spin(e){
-		e.preventDefault();
 		var newY = e.clientY || e.touches[0].clientY;
 		var newX = e.clientX ||e.touches[0].clientX;
 		document.onmouseup = this.spinEnd.bind(this);
@@ -65,7 +80,6 @@ export class PyramidNavService {
 		this.renderer.domElement.ontouchend = this.spinEnd.bind(this);
 		var dY = newY - this.lastY;
 		var dX = newX - this.lastX;
-		console.log(dX,dY);
 		this.cube.rotation.y += (dX * .003);
 		this.cube.rotation.x += (dY * .003);
 		this.lastX = newX;
@@ -88,9 +102,7 @@ export class PyramidNavService {
 		this.renderer.setClearColor(0xFFFFFF,0);
 		this.containerEl.appendChild(this.renderer.domElement);
 		var material = new Three.MeshLambertMaterial( { color: 0x00ff00 } );
-		var multiMaterial = [material];
-		this.cube = Three.SceneUtils.createMultiMaterialObject(new Three.TetrahedronGeometry( 30 ),multiMaterial );
-		// this.cube.rotation.set(-.5,-.5,0);
+		this.cube = new Three.Mesh(new Three.TetrahedronGeometry( 30 ),material );
 		this.scene.add( this.cube );
 		this.light.position.set(4,0,30);
 		this.scene.add( this.light );
@@ -116,7 +128,7 @@ export class PyramidNavService {
 				var triangle = new Three.Mesh(triangleGeometry, triangleMaterial);
 				var text = new Three.Mesh(geometry,material);
 				triangle.add(text);
-				text.rotation.set(0,0,.52)
+				text.rotation.set(0,0,.52);
 				text.position.set(route.textPosition.x,route.textPosition.y,route.textPosition.z);
 				triangle.position.set(route.position.x,route.position.y,route.position.z);
 				triangle.rotation.set(route.rotation.x,route.rotation.y,route.rotation.z);
