@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import * as Three from 'three';
 import {Routes} from './routes';
-import { Router } from '@angular/router';
+import { Router,ActivatedRoute } from '@angular/router';
 
 @Injectable()
 export class PyramidNavService {
@@ -12,15 +12,16 @@ export class PyramidNavService {
 	lastX;
 	lastY;
 	font;
+	shrunk;
 	light = new Three.DirectionalLight( 0xffffff, 2);
 	scene = new Three.Scene();
 	camera = new Three.PerspectiveCamera(45, 600/600);
 	renderer = new Three.WebGLRenderer({alpha:true});
 	raycaster = new Three.Raycaster();
 	routes = Routes;
-	autoRotate = false;
+	autoRotate = true;
 
-	constructor(private router:Router) { }
+	constructor(private router:Router,private activeRoute:ActivatedRoute) { }
 
 	public init() {
 		this.buildScene();
@@ -31,7 +32,7 @@ export class PyramidNavService {
 	private render(){
 		requestAnimationFrame(_ => this.render());
 		if(this.autoRotate){
-			this.cube.rotation.x += .003;
+			// this.cube.rotation.x += .003;
 			this.cube.rotation.y += .002;
 		}
 		this.renderer.render(this.scene , this.camera);
@@ -54,12 +55,20 @@ export class PyramidNavService {
 		document.ontouchmove = null;
 		this.raycaster.setFromCamera(vector,this.camera);
 		var objects = this.raycaster.intersectObjects(this.cube.children);
-		this.autoRotate = true;
-		this.containerEl.classList.toggle('shrunk');
-		if(objects[0]){
-			console.log(objects[0].object.userData);
-			this.router.navigate([objects[0].object.userData.path]);
+		if(objects[0]||this.shrunk){
+			this.containerEl.parentElement.classList.toggle('shrunk');
+			this.containerEl.classList.toggle('shrunk');
+			this.autoRotate = true;
+			if(objects[0]&&!this.shrunk) this.router.navigate([objects[0].object.userData.path]);
+			else{
+				setTimeout(function(){
+					this.router.navigate(['/']);
+				}.bind(this),1000);
+				
+			}
+			this.shrunk = !this.shrunk;
 		}
+		this.timeout = setTimeout(function(){this.autoRotate = true;}.bind(this),2000);
 	}
 
 	public interactionStartHandler(e){
@@ -74,6 +83,7 @@ export class PyramidNavService {
 	}
 
 	public spin(e){
+		if(this.shrunk) return;
 		var newY = e.clientY || e.touches[0].clientY;
 		var newX = e.clientX ||e.touches[0].clientX;
 		document.onmouseup = this.spinEnd.bind(this);
@@ -95,7 +105,7 @@ export class PyramidNavService {
 		document.ontouchend = null;
 		document.onmousemove = null;
 		document.ontouchmove = null;
-		// this.timeout = setTimeout(function(){this.autoRotate = true;}.bind(this),2000);
+		this.timeout = setTimeout(function(){this.autoRotate = true;}.bind(this),2000);
 	}
 
 	private buildScene(){
@@ -110,7 +120,8 @@ export class PyramidNavService {
 		this.scene.add( this.light );
 		this.camera.position.set(0,0,100);
 		var axisHelper = new Three.AxisHelper(100);
-		this.scene.add(axisHelper);
+		// this.scene.add(axisHelper);
+		console.log(this.activeRoute);
 		this.addNavItems();
 	}
 

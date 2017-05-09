@@ -2,3 +2,30 @@
 body{
 	background-color:blue;
 }
+
+.view{
+	+*{
+		>*{
+			animation:1000ms fade-out ease;
+		}
+	}
+}
+.shrunk ~ .view{
+	+*{
+		>*{
+			animation:1500ms fade-in ease;
+		}
+	}
+}
+
+
+@keyframes fade-in{
+	0%{opacity:0;}
+	33%{opacity:0;}
+	100%{opacity:1;}
+}
+
+@keyframes fade-out{
+	0%{opacity:1;}
+	100%{opacity:0;}
+}
