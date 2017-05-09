@@ -1,7 +1,7 @@
 export const Routes: any[] = [
 	{
 		name:'About',
-		path:'/about',
+		path:'about',
 		position:{
 			x:6,
 			y:-6.5,

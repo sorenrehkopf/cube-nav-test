@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import * as Three from 'three';
 import {Routes} from './routes';
+import { Router } from '@angular/router';
 
 @Injectable()
 export class PyramidNavService {
@@ -19,6 +20,7 @@ export class PyramidNavService {
 	routes = Routes;
 	autoRotate = false;
 
+	constructor(private router:Router) { }
 
 	public init() {
 		this.buildScene();
@@ -50,14 +52,14 @@ export class PyramidNavService {
 		var vector = new Three.Vector2(x,y);
 		document.onmousemove = null;
 		document.ontouchmove = null;
-		this.autoRotate = true;
-		this.containerEl.classList.toggle('shrunk');
 		this.raycaster.setFromCamera(vector,this.camera);
 		var objects = this.raycaster.intersectObjects(this.cube.children);
+		this.autoRotate = true;
+		this.containerEl.classList.toggle('shrunk');
 		if(objects[0]){
-
+			console.log(objects[0].object.userData);
+			this.router.navigate([objects[0].object.userData.path]);
 		}
-		console.log(objects,this.cube.children,vector);
 	}
 
 	public interactionStartHandler(e){
@@ -128,6 +130,7 @@ export class PyramidNavService {
 				var triangle = new Three.Mesh(triangleGeometry, triangleMaterial);
 				var text = new Three.Mesh(geometry,material);
 				triangle.add(text);
+				triangle.userData.path = route.path;
 				text.rotation.set(0,0,.52);
 				text.position.set(route.textPosition.x,route.textPosition.y,route.textPosition.z);
 				triangle.position.set(route.position.x,route.position.y,route.position.z);
@@ -143,7 +146,5 @@ export class PyramidNavService {
 		console.log(axis,adjust)
 		console.log(this.cube.children[this.cube.children.length-1][adjust][axis]);
 	}
-
-	constructor() { }
 
 }
